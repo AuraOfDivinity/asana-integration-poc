@@ -29,6 +29,14 @@ export class UserService {
     return userData;
   }
 
+  async findByEmail(email: string): Promise<User> {
+    const userData = await this.userRepository.findOneBy({ email });
+    if (!userData) {
+      throw new HttpException('User Not Found', 404);
+    }
+    return userData;
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const existingUser = await this.findOne(id);
     const userData = this.userRepository.merge(existingUser, updateUserDto);
