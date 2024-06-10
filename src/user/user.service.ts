@@ -31,10 +31,16 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User> {
     const userData = await this.userRepository.findOneBy({ email });
-    if (!userData) {
-      throw new HttpException('User Not Found', 404);
-    }
     return userData;
+  }
+
+  async findOrCreate(email: string, fullName: string): Promise<User> {
+    let user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      user = this.userRepository.create({ email, fullName });
+      await this.userRepository.save(user);
+    }
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
