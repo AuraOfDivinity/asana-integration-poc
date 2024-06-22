@@ -17,13 +17,13 @@ export class GoogleTokenValidationService {
     try {
       const response = await lastValueFrom(
         this.httpService.get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`,
+          `https://oauth2.googleapis.com/tokeninfo?access_token=${token}`,
         ),
       );
 
       console.log('Token validation response:', response.data);
 
-      if (!response.data || response.data.aud !== clientId) {
+      if (response.data.aud !== clientId) {
         throw new UnauthorizedException('Invalid token');
       }
 
