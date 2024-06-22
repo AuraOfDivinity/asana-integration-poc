@@ -10,7 +10,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL:
-        'https://asana-integration-poc-production.up.railway.app/auth/google/redirect',
+        'https://zapier.com/dashboard/auth/oauth/return/App207060CLIAPI/',
       scope: ['email', 'profile'],
     });
   }
