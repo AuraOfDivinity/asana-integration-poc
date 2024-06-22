@@ -133,6 +133,8 @@ export class AuthController {
       refresh_token,
     } = body;
 
+    console.log('Received token request:', body);
+
     if (grant_type === 'authorization_code') {
       try {
         const response = await axios.post(
@@ -141,8 +143,7 @@ export class AuthController {
             client_id,
             client_secret,
             code,
-            redirect_uri:
-              'https://zapier.com/dashboard/auth/oauth/return/App207060CLIAPI/',
+            redirect_uri,
             grant_type: 'authorization_code',
           },
           {
@@ -151,6 +152,8 @@ export class AuthController {
             },
           },
         );
+
+        console.log('Token response:', response.data);
 
         const { access_token, refresh_token, expires_in } = response.data;
         return {
@@ -182,6 +185,8 @@ export class AuthController {
             },
           },
         );
+
+        console.log('Refresh token response:', response.data);
 
         const { access_token, expires_in } = response.data;
         return {
