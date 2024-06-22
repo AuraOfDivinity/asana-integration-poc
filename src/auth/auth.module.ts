@@ -7,6 +7,9 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { GoogleStrategy } from './google.strategy';
+import { GoogleTokenValidationService } from './google-token-valcation.service';
+import { GoogleAuthGuard } from './google-auth.guard';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -21,8 +24,15 @@ import { GoogleStrategy } from './google.strategy';
     }),
     ConfigModule,
     UserModule,
+    HttpModule,
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    GoogleStrategy,
+    GoogleTokenValidationService,
+    GoogleAuthGuard,
+  ],
   exports: [AuthService],
   controllers: [AuthController],
 })

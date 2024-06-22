@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import axios from 'axios';
 import { UserDto } from 'src/user/dto/user.dto';
 import { Request } from 'express';
+import { GoogleAuthGuard } from './google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -245,11 +246,11 @@ export class AuthController {
     return { jwtToken };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(GoogleAuthGuard)
   @Get('me')
-  getMe(@Req() req: Request): UserDto {
+  getMe(@Req() req: Request): any {
     console.log({ req });
     const user = req.user as any;
-    return { userId: user.userId, username: user.username };
+    return { userId: user.sub, username: user.email }; // Adjust based on Google's user info structure
   }
 }
