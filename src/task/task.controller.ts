@@ -14,11 +14,16 @@ import { Task } from './task.entity';
 import { Request } from 'express';
 import { CreateTaskDto } from './dto/create-task-dto';
 import { GoogleAuthGuard } from 'src/auth/google-auth.guard';
+import { WebhooksService } from 'src/webhook/webhook.service';
+import axios from 'axios';
 
 @Controller('tasks')
 @UseGuards(GoogleAuthGuard)
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly webhooksService: WebhooksService,
+  ) {}
 
   @Post()
   async create(
@@ -30,7 +35,12 @@ export class TasksController {
       ...createTaskDto,
       taskOwner: req.user.email, // Adjust based on your user info
     };
-    return this.tasksService.create(task);
+    const newTask = await this.tasksService.create(task);
+
+    // Notify all subscribed webhooks for the task owner
+    await this.notifyZapier(newTask);
+
+    return newTask;
   }
 
   @Get()
@@ -54,5 +64,12 @@ export class TasksController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     await this.tasksService.remove(id);
+  }
+
+  private async notifyZapier(task: Task) {
+    const userWebhooks = await this.webhooksService.findByUser(task.taskOwner);
+    for (const webhook of userWebhooks) {
+      await axios.post(webhook.url, task);
+    }
   }
 }
