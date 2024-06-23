@@ -30,4 +30,8 @@ export class TasksService {
   async remove(taskId: number): Promise<void> {
     await this.tasksRepository.delete(taskId);
   }
+
+  async findTasksByEmail(email: string): Promise<Task[]> {
+    return this.tasksRepository.find({ where: { taskOwner: email } });
+  }
 }

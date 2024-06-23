@@ -8,6 +8,7 @@ import {
   Body,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './task.service';
 import { Task } from './task.entity';
@@ -44,8 +45,12 @@ export class TasksController {
   }
 
   @Get()
-  async findAll(): Promise<Task[]> {
-    return this.tasksService.findAll();
+  async findAll(@Query('email') email?: string): Promise<Task[]> {
+    if (email) {
+      return this.tasksService.findTasksByEmail(email);
+    } else {
+      return this.tasksService.findAll();
+    }
   }
 
   @Get(':id')
@@ -64,6 +69,11 @@ export class TasksController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     await this.tasksService.remove(id);
+  }
+
+  @Get()
+  async getTasksByEmail(@Query('email') email: string): Promise<Task[]> {
+    return this.tasksService.findTasksByEmail(email);
   }
 
   private async notifyZapier(task: Task) {
