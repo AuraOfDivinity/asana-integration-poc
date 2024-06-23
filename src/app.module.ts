@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './user/entities/user.entity';
 import typeorm from './config/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { TasksModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     ActionModule,
     UserModule,
     AuthModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
