@@ -21,11 +21,11 @@ export class GoogleTokenValidationService {
         ),
       );
 
-      console.log('Token validation response:', response.data);
-
       if (response.data.aud !== clientId) {
         throw new UnauthorizedException('Invalid token');
       }
+
+      console.log({ response });
 
       return response.data;
     } catch (error) {

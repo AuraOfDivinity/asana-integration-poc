@@ -12,6 +12,7 @@ export class WebhooksService {
 
   async create(webhook: Partial<Webhook>): Promise<Webhook> {
     const newWebhook = this.webhooksRepository.create(webhook);
+    console.log({ newWebhook });
     return this.webhooksRepository.save(newWebhook);
   }
 

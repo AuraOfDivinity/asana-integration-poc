@@ -11,6 +11,8 @@ export class WebhooksController {
   @UseGuards(GoogleAuthGuard)
   @Post('subscribe')
   async subscribe(@Body('url') url: string, @Req() req: Request) {
+    console.log(`subscribe called for user ${req.user.email}`);
+
     await this.webhooksService.create({ url, user: req.user.email });
     return { message: 'Subscription successful' };
   }

@@ -29,6 +29,7 @@ export class GoogleAuthGuard implements CanActivate {
     const userData =
       await this.googleTokenValidationService.validateToken(token);
     request.user = userData;
+    console.log({ userData });
 
     return true;
   }
