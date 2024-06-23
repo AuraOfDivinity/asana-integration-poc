@@ -135,74 +135,77 @@ export class AuthController {
 
     console.log('Received token request:', body);
 
-    if (grant_type === 'authorization_code') {
-      try {
-        const response = await axios.post(
-          'https://oauth2.googleapis.com/token',
-          {
-            client_id,
-            client_secret,
-            code,
-            redirect_uri,
-            grant_type: 'authorization_code',
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+    try {
+      let params;
 
-        console.log('Token response:', response.data);
-
-        const { access_token, refresh_token, expires_in } = response.data;
-        return {
-          access_token,
-          token_type: 'Bearer',
-          expires_in,
+      if (grant_type === 'authorization_code') {
+        params = new URLSearchParams({
+          client_id,
+          client_secret,
+          code,
+          redirect_uri,
+          grant_type: 'authorization_code',
+        });
+      } else if (grant_type === 'refresh_token') {
+        params = new URLSearchParams({
+          client_id,
+          client_secret,
           refresh_token,
-        };
-      } catch (error) {
-        console.error('Error exchanging token:', error.response.data);
+          grant_type: 'refresh_token',
+        });
+      } else {
+        throw new HttpException(
+          'Unsupported grant type',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const response = await axios.post(
+        'https://oauth2.googleapis.com/token',
+        params.toString(),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+
+      console.log('Token response:', response.data);
+
+      const {
+        access_token,
+        refresh_token: new_refresh_token,
+        expires_in,
+      } = response.data;
+
+      return {
+        access_token,
+        token_type: 'Bearer',
+        expires_in,
+        refresh_token: new_refresh_token || refresh_token, // Return existing refresh token if no new one is provided
+      };
+    } catch (error) {
+      console.error(
+        'Error exchanging token:',
+        error.response?.data || error.message,
+      );
+
+      if (grant_type === 'authorization_code') {
         throw new HttpException(
           'Invalid authorization code',
           HttpStatus.BAD_REQUEST,
         );
-      }
-    } else if (grant_type === 'refresh_token') {
-      try {
-        const response = await axios.post(
-          'https://oauth2.googleapis.com/token',
-          {
-            client_id,
-            client_secret,
-            refresh_token,
-            grant_type: 'refresh_token',
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-
-        console.log('Refresh token response:', response.data);
-
-        const { access_token, expires_in } = response.data;
-        return {
-          access_token,
-          token_type: 'Bearer',
-          expires_in,
-        };
-      } catch (error) {
-        console.error('Error refreshing token:', error.response.data);
+      } else if (grant_type === 'refresh_token') {
         throw new HttpException(
           'Invalid token refresh',
           HttpStatus.BAD_REQUEST,
         );
+      } else {
+        throw new HttpException(
+          'Unsupported grant type',
+          HttpStatus.BAD_REQUEST,
+        );
       }
-    } else {
-      throw new HttpException('Unsupported grant type', HttpStatus.BAD_REQUEST);
     }
   }
 
