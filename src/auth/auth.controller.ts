@@ -251,9 +251,8 @@ export class AuthController {
 
   @UseGuards(GoogleAuthGuard)
   @Get('me')
-  getMe(@Req() req: Request): UserDto {
-    console.log({ req });
+  getMe(@Req() req: Request) {
     const user = req.user as any;
-    return { userId: user.userId, username: user.username };
+    return { email: user.email };
   }
 }
